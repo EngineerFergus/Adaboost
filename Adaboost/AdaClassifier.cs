@@ -78,13 +78,13 @@ namespace Adaboost
 
                 for(int j = 0; j < W.Length; j++)
                 {
-                    W[i] = W[i] * Math.Exp(-Y[i] * bestStump.Alpha * YHat[i]);
-                    sum += W[i];
+                    W[j] = W[j] * Math.Exp(-Y[j] * bestStump.Alpha * YHat[j]);
+                    sum += W[j];
                 }
 
                 for(int j = 0; j < W.Length; j++)
                 {
-                    W[i] /= sum;
+                    W[j] /= sum;
                 }
             }
         }
@@ -132,11 +132,11 @@ namespace Adaboost
             {
                 if(featureNames is null)
                 {
-                    data.AppendLine($"{stump.FeatureIndex},{stump.Threshold},{stump.Parity},{stump.Alpha}");
+                    data.AppendLine($"{stump.FeatureIndex}, {stump.Threshold}, {stump.Parity}, {stump.Alpha}");
                 }
                 else
                 {
-                    data.AppendLine($"{featureNames[stump.FeatureIndex]}_{stump.FeatureIndex},{stump.Threshold},{stump.Parity},{stump.Alpha}");
+                    data.AppendLine($"{featureNames[stump.FeatureIndex]} [{stump.FeatureIndex}], {stump.Threshold}, {stump.Parity}, {stump.Alpha}");
                 }
             }
 

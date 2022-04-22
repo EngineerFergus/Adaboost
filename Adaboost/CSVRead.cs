@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Adaboost
 {
-    internal class CSVReader
+    public class CSVRead
     {
         public static CSVData ReadCSV(string dir)
         {

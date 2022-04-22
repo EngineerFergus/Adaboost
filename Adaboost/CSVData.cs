@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Adaboost
 {
-    internal class CSVData
+    public class CSVData
     {
         public string[] Headers { get; set; }
         public string[]? LabelNames { get; set; }
