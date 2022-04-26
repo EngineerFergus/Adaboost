@@ -11,8 +11,4 @@
     <ProjectReference Include="..\Adaboost\Adaboost.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Resource\" />
-  </ItemGroup>
-
 </Project>
