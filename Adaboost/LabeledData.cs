@@ -25,17 +25,17 @@ namespace Adaboost
             this.features = features;
         }
 
-        public int[] ToOneHot(int numClasses)
+        public int[] GetOneHotLabel(int numClasses)
         {
             if(numClasses <= Label)
             {
-                throw new ArgumentException($"Exception in {nameof(ToOneHot)}: Cannot convert to " +
+                throw new ArgumentException($"Exception in {nameof(GetOneHotLabel)}: Cannot convert to " +
                     $"one hot encoding when label is greater than total number of classes.");
             }
 
             if(Label < 0)
             {
-                throw new Exception($"Exception in {nameof(ToOneHot)}: Cannot convert to one hot " +
+                throw new Exception($"Exception in {nameof(GetOneHotLabel)}: Cannot convert to one hot " +
                     $"encoding with a label less than zero.");
             }
 
