@@ -39,44 +39,52 @@ namespace Adaboost
             return Y;
         }
 
-        public double Train(double[] X, double[] W, int[] Y)
+        public int[] Predict(AdaData[] data)
         {
-            double[] thresholds = X.Distinct().ToArray();
-            int[] predictions = new int[X.Length];
+            int[] Y = new int[data.Length];
+
+            for (int i = 0; i < data.Length; i++)
+            {
+                Y[i] = data[i][FeatureIndex] > Threshold ? 1 * Parity : -1 * Parity;
+            }
+
+            return Y;
+        }
+
+        public int Predict(AdaData data)
+        {
+            return data[FeatureIndex] > Threshold ? 1 * Parity : -1 * Parity;
+        }
+
+        public double Train(AdaData[] data, double[] W)
+        {
+            double[] thresholds = data.Select(x => x[FeatureIndex]).Distinct().ToArray();
             double minError = double.MaxValue;
             double bestThreshold = Threshold;
             int bestPolarity = Parity;
 
-            foreach(double t in thresholds)
+            foreach (double t in thresholds)
             {
                 double error = 0.0;
+                int p = 1;
 
-                for (int i = 0; i < X.Length; i++)
+                for (int i = 0; i < data.Length; i++)
                 {
-                    predictions[i] = X[i] > t ? 1 : -1;
-                    if(predictions[i] != Y[i]) { error += W[i]; }
+                    int yP = data[i][FeatureIndex] > t ? 1 : -1;
+                    if (yP != data[i].Label) { error += W[i]; }
                 }
 
-                if(error < minError)
+                if(error > 0.5)
                 {
-                    minError = error;
-                    bestThreshold = t;
-                    bestPolarity = 1;
-                }
-
-                error = 0;
-
-                for (int i = 0; i < X.Length; i++)
-                {
-                    predictions[i] = X[i] > t ? -1 : 1;
-                    if (predictions[i] != Y[i]) { error += W[i]; }
+                    p = -1;
+                    error = 1.0 - error;
                 }
 
                 if (error < minError)
                 {
                     minError = error;
                     bestThreshold = t;
-                    bestPolarity = -1;
+                    bestPolarity = p;
                 }
             }
 

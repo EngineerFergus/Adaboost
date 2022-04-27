@@ -3,23 +3,18 @@
 using Adaboost;
 
 Console.WriteLine("Hello, World!");
-CSVData data = CSVRead.ReadCSV("C:\\temp\\ionosphere.csv");
+AdaDataSet dataSet = Util.ReadAdaData("C:\\temp\\ionosphere.csv");
 AdaClassifier classifier = new AdaClassifier(50);
 
-for(int i = 0; i < data.Labels.Length; i++)
-{
-    if(data.Labels[i] == 0) { data.Labels[i] = -1; }
-}
-
-classifier.Train(data.Features, data.Labels, data.Headers);
-int[] predictions = classifier.Predict(data.Features);
+classifier.Train(dataSet.Data, dataSet.FeatureNames);
+int[] predictions = classifier.Predict(dataSet.Data);
 
 int correct = 0;
 
 for(int i = 0; i < predictions.Length; i++)
 {
-    if(predictions[i] == data.Labels[i]) { correct++; }
+    if(predictions[i] == dataSet.Data[i].Label) { correct++; }
 }
 
-Console.WriteLine($"Classifier Accuracy: {correct} / {data.Labels.Length}");
+Console.WriteLine($"Classifier Accuracy: {correct} / {dataSet.Data.Length}");
 Console.WriteLine(classifier.PrintOutClassifier());

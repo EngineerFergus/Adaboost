@@ -19,51 +19,37 @@ namespace Adaboost
             stumps = new List<DecisionStump>();
         }
 
-        public void Train(double[][] X, int[] Y, string[] featureNames)
+        public void Train(AdaData[] data, string[] featureNames)
         {
-            if(featureNames.Length != X.Length)
-            {
-                throw new ArgumentException($"Length of {nameof(featureNames)} and {nameof(X)} " +
-                    $"must be equivalent.");
-            }
-
             this.featureNames = featureNames;
-
-            Train(X, Y);
+            Train(data);
         }
 
-        public void Train(double[][] X, int[] Y)
+        public void Train(AdaData[] data)
         {
-            for (int i = 0; i < X.Length; i++)
-            {
-                if (X[i].Length != Y.Length)
-                {
-                    throw new ArgumentException($"Length of each set of features in {nameof(X)} did not " +
-                        $"match length of {nameof(Y)}.");
-                }
-            }
+            if(data.Length == 0) { throw new Exception("Cannot train adaboost classifier on empty array."); }
 
-            double[] W = new double[Y.Length];
-            int N = Y.Length;
-            int numFeatures = X.Length;
+            double[] W = new double[data.Length];
+            int N = data.Length;
+            int numFeatures = data[0].Length;
 
-            for(int i = 0; i < N; i++)
+            for (int i = 0; i < N; i++)
             {
                 W[i] = 1.0 / N;
             }
 
 
-            for(int i = 0; i < NumClassifiers; i++)
+            for (int i = 0; i < NumClassifiers; i++)
             {
                 double minError = double.MaxValue;
                 DecisionStump bestStump = new DecisionStump(0);
 
-                for(int j = 0; j < numFeatures; j++)
+                for (int j = 0; j < numFeatures; j++)
                 {
                     DecisionStump testStump = new DecisionStump(j);
-                    double err = testStump.Train(X[j], W, Y);
+                    double err = testStump.Train(data, W);
 
-                    if(err < minError)
+                    if (err < minError)
                     {
                         minError = err;
                         bestStump = testStump;
@@ -72,41 +58,21 @@ namespace Adaboost
 
                 stumps.Add(bestStump);
 
-                int[] YHat = bestStump.Predict(X[bestStump.FeatureIndex]);
+                int[] YHat = bestStump.Predict(data);
 
                 double sum = 0;
 
-                for(int j = 0; j < W.Length; j++)
+                for (int j = 0; j < W.Length; j++)
                 {
-                    W[j] = W[j] * Math.Exp(-Y[j] * bestStump.Alpha * YHat[j]);
+                    W[j] = W[j] * Math.Exp(-data[j].Label * bestStump.Alpha * YHat[j]);
                     sum += W[j];
                 }
 
-                for(int j = 0; j < W.Length; j++)
+                for (int j = 0; j < W.Length; j++)
                 {
                     W[j] /= sum;
                 }
             }
-        }
-
-        public int[] Predict(double[][] X)
-        {
-            int N = X[0].Length;
-            int[] Y = new int[N];
-
-            for(int i = 0; i < N; i++)
-            {
-                double sum = 0.0;
-
-                foreach(DecisionStump stump in stumps)
-                {
-                    sum += stump.Predict(X[stump.FeatureIndex][i]) * stump.Alpha;
-                }
-
-                Y[i] = sum >= 0 ? 1 : -1;
-            }
-
-            return Y;
         }
 
         public int Predict(double[] X)
@@ -119,6 +85,30 @@ namespace Adaboost
             }
 
             return sum >= 0 ? 1 : -1;
+        }
+
+        public int Predict(AdaData d)
+        {
+            double sum = 0.0;
+
+            foreach(DecisionStump stump in stumps)
+            {
+                sum += stump.Predict(d) * stump.Alpha;
+            }
+
+            return sum > 0 ? 1 : -1;
+        }
+
+        public int[] Predict(AdaData[] data)
+        {
+            int[] yPred = new int[data.Length];
+            
+            for(int i = 0; i < yPred.Length; i++)
+            {
+                yPred[i] = Predict(data[i]);
+            }
+
+            return yPred;
         }
 
         public string PrintOutClassifier()

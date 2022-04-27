@@ -10,6 +10,7 @@ namespace Adaboost
     {
         private double[] features;
         public int Label { get; }
+        public int Length => features.Length;
 
         public double this[int index]
         {
